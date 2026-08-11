@@ -177,6 +177,18 @@
         }
       ]
     },
+    "Svelte": {
+      "format_on_save": "on",
+      "prettier": {
+        "allowed": true,
+        "plugins": ["prettier-plugin-svelte"],
+        "parser": "svelte"
+      },
+      "formatter": "prettier",
+      "code_actions_on_format": {
+        "source.fixAll.oxc": true
+      }
+    },
     "SCSS": {
       "format_on_save": "on",
       "prettier": {

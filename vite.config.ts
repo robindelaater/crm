@@ -6,6 +6,7 @@ import { defineConfig, lazyPlugins } from "vite-plus";
 export default defineConfig({
   staged: {
     "*": "vp check --fix",
+    "*.svelte": "vp exec prettier --write",
   },
   fmt: {},
   lint: {
