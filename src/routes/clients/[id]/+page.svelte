@@ -1,5 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import * as AlertDialog from "$lib/components/ui/alert-dialog";
+  import { Button } from "$lib/components/ui/button";
   import {
     billingPeriodLabels,
     formatAmount,
@@ -11,14 +13,67 @@
     projectState,
     projectStateLabels,
   } from "$lib/state";
-  import { getClient } from "../clients.remote";
+  import { deleteClientForm, getClient } from "../clients.remote";
 
   const client = $derived(await getClient(page.params.id!));
+  const removeClient = $derived(deleteClientForm.for(client.id));
+
+  const attached = $derived([
+    [client.contacts.length, "contact"],
+    [client.projects.length, "project"],
+    [client.contracts.length, "contract"],
+  ] as const);
+
+  const deletedAlongside = $derived(
+    new Intl.ListFormat("en-GB").format(
+      attached
+        .filter(([count]) => count > 0)
+        .map(([count, noun]) => `${count} ${noun}${count === 1 ? "" : "s"}`),
+    ),
+  );
 </script>
 
 <main class="mx-auto max-w-lg px-6 py-16">
   <a href="/clients" class="text-muted-foreground text-sm">Clients</a>
-  <h1 class="mt-2 text-xl font-medium">{client.name}</h1>
+  <div class="mt-2 flex items-baseline justify-between gap-4">
+    <h1 class="text-xl font-medium">{client.name}</h1>
+    <div class="flex items-center gap-2">
+      <Button href="/clients/{client.id}/edit" variant="outline" size="sm"
+        >Edit</Button
+      >
+      <AlertDialog.Root>
+        <AlertDialog.Trigger>
+          {#snippet child({ props })}
+            <Button {...props} variant="ghost" size="sm">Delete</Button>
+          {/snippet}
+        </AlertDialog.Trigger>
+        <AlertDialog.Content>
+          <AlertDialog.Header>
+            <AlertDialog.Title>Delete {client.name}?</AlertDialog.Title>
+            <AlertDialog.Description>
+              {#if deletedAlongside}
+                This also deletes {deletedAlongside}. It cannot be undone.
+              {:else}
+                This cannot be undone.
+              {/if}
+            </AlertDialog.Description>
+          </AlertDialog.Header>
+          <AlertDialog.Footer>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <form {...removeClient}>
+              <input {...removeClient.fields.id.as("hidden", client.id)} />
+              <AlertDialog.Action
+                type="submit"
+                variant="destructive"
+                disabled={removeClient.pending > 0}
+                >Delete client</AlertDialog.Action
+              >
+            </form>
+          </AlertDialog.Footer>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
+    </div>
+  </div>
   {#if client.notes}
     <p class="text-muted-foreground mt-2 text-sm whitespace-pre-line">
       {client.notes}

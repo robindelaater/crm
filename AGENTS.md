@@ -29,6 +29,8 @@ Exception: a comment that records _why_ something non-obvious is true, where the
 
 `docs/adr/` records decisions that would otherwise look wrong. Read before "fixing" something surprising.
 
+**Architecture decisions go through me. Always, no exceptions.** Schema shape, new tables or columns, route structure, derived-vs-stored state, new dependencies, deployment, anything that would earn an ADR — propose it and wait for my answer. Do not decide and then tell me.
+
 Two that catch people out:
 
 - **State is derived from dates, never stored.** `status` holds only what I decide (`active`, `non_renewing`, `cancelled`). Expired, running and completed are read from date columns at query time. There is no cron job and there should not be one. See ADR 0001.

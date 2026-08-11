@@ -1,12 +1,7 @@
 <script lang="ts">
+  import ClientFields from "$lib/components/client-fields.svelte";
   import { Button } from "$lib/components/ui/button";
-  import { Input } from "$lib/components/ui/input";
-  import { Label } from "$lib/components/ui/label";
-  import { Textarea } from "$lib/components/ui/textarea";
   import { createClientForm } from "../clients.remote";
-
-  let name = $derived(createClientForm.fields.name);
-  let notes = $derived(createClientForm.fields.notes);
 </script>
 
 <main class="mx-auto max-w-lg px-6 py-16">
@@ -16,18 +11,10 @@
   </p>
 
   <form {...createClientForm} class="mt-8 space-y-6">
-    <div class="space-y-2">
-      <Label for="name">Name</Label>
-      <Input id="name" {...name.as("text")} autocomplete="off" />
-      {#each name.issues() ?? [] as issue (issue.message)}
-        <p class="text-destructive text-sm">{issue.message}</p>
-      {/each}
-    </div>
-
-    <div class="space-y-2">
-      <Label for="notes">Notes</Label>
-      <Textarea id="notes" {...notes.as("text")} rows={4} />
-    </div>
+    <ClientFields
+      name={createClientForm.fields.name}
+      notes={createClientForm.fields.notes}
+    />
 
     <div class="flex items-center gap-3">
       <Button type="submit" disabled={createClientForm.pending > 0}
