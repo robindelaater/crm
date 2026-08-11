@@ -10,11 +10,13 @@
     "prepare": "vp config && svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply laater-crm --remote",
     "db:migrate:local": "wrangler d1 migrations apply laater-crm --local",
     "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "valibot": "^1.4.2"
   },
   "devDependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
@@ -24,6 +26,7 @@
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@tailwindcss/vite": "^4.3.0",
     "@types/node": "^24",
+    "bits-ui": "^2.18.1",
     "clsx": "^2.1.1",
     "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2",

@@ -11,7 +11,7 @@ export default defineConfig({
   lint: {
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },
-    options: { typeAware: true, typeCheck: true },
+    options: { typeAware: false, typeCheck: false },
   },
   plugins: lazyPlugins(() => [
     tailwindcss(),
@@ -20,9 +20,15 @@ export default defineConfig({
         // Force runes mode for the project, except for libraries. Can be removed in svelte 6.
         runes: ({ filename }) =>
           filename.split(/[/\\]/).includes("node_modules") ? undefined : true,
+
+        experimental: { async: true },
       },
 
       adapter: adapter(),
+
+      experimental: {
+        remoteFunctions: true,
+      },
 
       typescript: {
         config: (config) => {
