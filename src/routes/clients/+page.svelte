@@ -13,7 +13,9 @@
 
 	<ul class="mt-8 divide-y">
 		{#each clients as client (client.id)}
-			<li class="py-3 text-sm">{client.name}</li>
+			<li class="py-3 text-sm">
+				<a href="/clients/{client.id}" class="hover:underline">{client.name}</a>
+			</li>
 		{:else}
 			<li class="text-muted-foreground py-3 text-sm">No clients yet.</li>
 		{/each}
