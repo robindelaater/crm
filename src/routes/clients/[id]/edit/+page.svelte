@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import ClientFields from "$lib/components/client-fields.svelte";
+  import ClientFields from "$lib/components/ClientFields.svelte";
   import { Button } from "$lib/components/ui/button";
   import { getClient, updateClientForm } from "../../clients.remote";
 

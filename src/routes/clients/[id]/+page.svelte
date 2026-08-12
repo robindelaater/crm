@@ -105,7 +105,9 @@
     <ul class="mt-3 divide-y">
       {#each client.projects as project (project.id)}
         <li class="flex items-baseline justify-between gap-4 py-3 text-sm">
-          <span>{project.name}</span>
+          <a href="/projects/{project.id}" class="hover:underline"
+            >{project.name}</a
+          >
           <span class="text-muted-foreground"
             >{projectLifecycleLabels[project.lifecycle]}</span
           >

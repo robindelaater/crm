@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ClientFields from "$lib/components/client-fields.svelte";
+  import ClientFields from "$lib/components/ClientFields.svelte";
   import { Button } from "$lib/components/ui/button";
   import { createClientForm } from "../clients.remote";
 </script>

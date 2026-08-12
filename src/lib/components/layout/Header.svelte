@@ -1,5 +1,5 @@
 <script>
-  import ThemeToggle from "../theme-toggle.svelte";
+  import ThemeToggle from "../ThemeToggle.svelte";
 </script>
 
 <header class="mx-auto max-w-lg px-6 py-16 grid grid-flow-col items-center">

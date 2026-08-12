@@ -1,6 +1,6 @@
 import { form, getRequestEvent, query } from "$app/server";
-import { redirect } from "@sveltejs/kit";
-import { asc } from "drizzle-orm";
+import { error, redirect } from "@sveltejs/kit";
+import { asc, eq } from "drizzle-orm";
 import * as v from "valibot";
 import { getDb } from "$lib/server/db";
 import { project } from "$lib/server/db/schema";
@@ -18,6 +18,17 @@ export const listProjects = query(async () => {
   const on = today();
 
   return projects.map((project) => withProjectLifecycle(project, on));
+});
+
+export const getProject = query(v.string(), async (id) => {
+  const found = await db().query.project.findFirst({
+    where: (row, { eq }) => eq(row.id, id),
+    with: { client: true },
+  });
+
+  if (!found) error(404, "Project not found");
+
+  return withProjectLifecycle(found);
 });
 
 const optionalText = v.pipe(
@@ -42,3 +53,30 @@ export const createProjectForm = form(
     redirect(303, "/projects");
   },
 );
+
+const applyToProject = async (id: string, values: Partial<typeof project.$inferInsert>) => {
+  const updated = await db()
+    .update(project)
+    .set(values)
+    .where(eq(project.id, id))
+    .returning({ clientId: project.clientId });
+
+  const changed = updated[0];
+
+  if (!changed) error(404, "Project not found");
+
+  await getProject(id).refresh();
+  await listProjects().refresh();
+  await getClient(changed.clientId).refresh();
+};
+
+export const completeProjectForm = form(
+  v.object({ id: v.string(), completedOn: v.pipe(v.string(), v.isoDate()) }),
+  async ({ id, completedOn }) => {
+    await applyToProject(id, { completedOn });
+  },
+);
+
+export const cancelProjectForm = form(v.object({ id: v.string() }), async ({ id }) => {
+  await applyToProject(id, { status: "cancelled" });
+});

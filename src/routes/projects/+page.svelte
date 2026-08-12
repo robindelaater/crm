@@ -16,7 +16,9 @@
     {#each projects as project (project.id)}
       <li class="flex items-baseline justify-between gap-4 py-3 text-sm">
         <span>
-          <span>{project.name}</span>
+          <a href="/projects/{project.id}" class="hover:underline"
+            >{project.name}</a
+          >
           <a
             href="/clients/{project.clientId}"
             class="text-muted-foreground hover:underline"
