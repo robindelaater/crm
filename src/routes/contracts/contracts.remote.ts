@@ -110,3 +110,29 @@ export const updateContractForm = form(
     redirect(303, `/contracts/${id}`);
   },
 );
+
+const applyToContract = async (id: string, values: Partial<typeof contract.$inferInsert>) => {
+  const updated = await db()
+    .update(contract)
+    .set(values)
+    .where(eq(contract.id, id))
+    .returning({ clientId: contract.clientId });
+
+  const changed = updated[0];
+
+  if (!changed) error(404, "Contract not found");
+
+  await getContract(id).refresh();
+  await listContracts().refresh();
+  await listContractsNeedingAttention().refresh();
+  await getStats().refresh();
+  await getClient(changed.clientId).refresh();
+};
+
+export const nonRenewContractForm = form(v.object({ id: v.string() }), async ({ id }) => {
+  await applyToContract(id, { status: "non_renewing" });
+});
+
+export const cancelContractForm = form(v.object({ id: v.string() }), async ({ id }) => {
+  await applyToContract(id, { status: "cancelled" });
+});

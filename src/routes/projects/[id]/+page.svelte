@@ -96,7 +96,12 @@
         A project is completed after the last invoice is paid.
       </Dialog.Description>
     </Dialog.Header>
-    <form {...complete} class="space-y-2">
+    <form
+      {...complete.enhance(async ({ submit }) => {
+        if (await submit()) completing = false;
+      })}
+      class="space-y-2"
+    >
       <input {...complete.fields.id.as("hidden", project.id)} />
       <Label for="completedOn">Completion date</Label>
       <Input
@@ -131,7 +136,11 @@
     </AlertDialog.Header>
     <AlertDialog.Footer>
       <AlertDialog.Cancel>Keep it</AlertDialog.Cancel>
-      <form {...cancel}>
+      <form
+        {...cancel.enhance(async ({ submit }) => {
+          if (await submit()) cancelling = false;
+        })}
+      >
         <input {...cancel.fields.id.as("hidden", project.id)} />
         <AlertDialog.Action
           type="submit"

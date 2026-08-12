@@ -1,15 +1,29 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import DotsThreeIcon from "phosphor-svelte/lib/DotsThree";
+  import * as AlertDialog from "$lib/components/ui/alert-dialog";
   import { Button } from "$lib/components/ui/button";
-  import { contractLifecycleLabels, isRenewable } from "$lib/lifecycle";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+  import { contractLifecycleLabels, isLive, isRenewable } from "$lib/lifecycle";
   import {
     billingPeriodLabels,
     formatAmount,
     monthlyEquivalentCents,
   } from "$lib/money";
-  import { getContract } from "../contracts.remote";
+  import {
+    cancelContractForm,
+    getContract,
+    nonRenewContractForm,
+  } from "../contracts.remote";
 
   const contract = $derived(await getContract(page.params.id!));
+  const nonRenew = $derived(nonRenewContractForm.for(contract.id));
+  const cancel = $derived(cancelContractForm.for(contract.id));
+
+  const live = $derived(isLive(contract));
+
+  let nonRenewing = $state(false);
+  let cancelling = $state(false);
 </script>
 
 <main class="mx-auto max-w-lg px-6 py-16">
@@ -25,6 +39,35 @@
       </Button>
       {#if isRenewable(contract)}
         <Button href="/contracts/{contract.id}/renew" size="sm">Renew</Button>
+      {/if}
+      {#if live}
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger>
+            {#snippet child({ props })}
+              <Button
+                {...props}
+                variant="ghost"
+                size="icon"
+                aria-label="Contract actions"
+              >
+                <DotsThreeIcon class="size-5" weight="bold" />
+              </Button>
+            {/snippet}
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content align="end">
+            {#if contract.lifecycle === "active"}
+              <DropdownMenu.Item onSelect={() => (nonRenewing = true)}>
+                Non-renew
+              </DropdownMenu.Item>
+            {/if}
+            <DropdownMenu.Item
+              variant="destructive"
+              onSelect={() => (cancelling = true)}
+            >
+              Cancel
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
       {/if}
     </div>
   </div>
@@ -103,3 +146,55 @@
     </p>
   {/if}
 </main>
+
+<AlertDialog.Root bind:open={nonRenewing}>
+  <AlertDialog.Content>
+    <AlertDialog.Header>
+      <AlertDialog.Title>Let {contract.name} expire?</AlertDialog.Title>
+      <AlertDialog.Description>
+        It runs to {contract.expiresOn} without a renewal, and keeps serving the client
+        until then.
+      </AlertDialog.Description>
+    </AlertDialog.Header>
+    <AlertDialog.Footer>
+      <AlertDialog.Cancel>Keep it up for renewal</AlertDialog.Cancel>
+      <form
+        {...nonRenew.enhance(async ({ submit }) => {
+          if (await submit()) nonRenewing = false;
+        })}
+      >
+        <input {...nonRenew.fields.id.as("hidden", contract.id)} />
+        <AlertDialog.Action type="submit" disabled={nonRenew.pending > 0}>
+          Non-renew contract
+        </AlertDialog.Action>
+      </form>
+    </AlertDialog.Footer>
+  </AlertDialog.Content>
+</AlertDialog.Root>
+
+<AlertDialog.Root bind:open={cancelling}>
+  <AlertDialog.Content>
+    <AlertDialog.Header>
+      <AlertDialog.Title>Cancel {contract.name}?</AlertDialog.Title>
+      <AlertDialog.Description>
+        Cancelled means ended before {contract.expiresOn}. To let it run out
+        instead, non-renew it.
+      </AlertDialog.Description>
+    </AlertDialog.Header>
+    <AlertDialog.Footer>
+      <AlertDialog.Cancel>Keep it</AlertDialog.Cancel>
+      <form
+        {...cancel.enhance(async ({ submit }) => {
+          if (await submit()) cancelling = false;
+        })}
+      >
+        <input {...cancel.fields.id.as("hidden", contract.id)} />
+        <AlertDialog.Action
+          type="submit"
+          variant="destructive"
+          disabled={cancel.pending > 0}>Cancel contract</AlertDialog.Action
+        >
+      </form>
+    </AlertDialog.Footer>
+  </AlertDialog.Content>
+</AlertDialog.Root>
