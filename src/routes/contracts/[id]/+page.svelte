@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { Button } from "$lib/components/ui/button";
-  import { contractLifecycleLabels } from "$lib/lifecycle";
+  import { contractLifecycleLabels, isRenewable } from "$lib/lifecycle";
   import {
     billingPeriodLabels,
     formatAmount,
@@ -23,6 +23,9 @@
       <Button href="/contracts/{contract.id}/edit" variant="outline" size="sm">
         Edit
       </Button>
+      {#if isRenewable(contract)}
+        <Button href="/contracts/{contract.id}/renew" size="sm">Renew</Button>
+      {/if}
     </div>
   </div>
   <a
@@ -72,6 +75,16 @@
         <dd>{contract.contact.name}</dd>
       </div>
     {/if}
+    {#each contract.renewals as renewal (renewal.id)}
+      <div class="flex items-baseline justify-between gap-4 py-3">
+        <dt class="text-muted-foreground">Renewed by</dt>
+        <dd>
+          <a href="/contracts/{renewal.id}" class="hover:underline">
+            {renewal.name}
+          </a>
+        </dd>
+      </div>
+    {/each}
     {#if contract.renewalOf}
       <div class="flex items-baseline justify-between gap-4 py-3">
         <dt class="text-muted-foreground">Renewal of</dt>

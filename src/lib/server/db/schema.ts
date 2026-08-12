@@ -101,7 +101,7 @@ export const projectRelations = relations(project, ({ one, many }) => ({
   contracts: many(contract),
 }));
 
-export const contractRelations = relations(contract, ({ one }) => ({
+export const contractRelations = relations(contract, ({ one, many }) => ({
   client: one(client, { fields: [contract.clientId], references: [client.id] }),
   contact: one(contact, { fields: [contract.contactId], references: [contact.id] }),
   project: one(project, { fields: [contract.projectId], references: [project.id] }),
@@ -110,4 +110,5 @@ export const contractRelations = relations(contract, ({ one }) => ({
     fields: [contract.renewalOfId],
     references: [contract.id],
   }),
+  renewals: many(contract, { relationName: "renewal" }),
 }));

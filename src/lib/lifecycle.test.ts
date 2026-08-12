@@ -3,8 +3,10 @@ import {
   contractLifecycle,
   daysUntil,
   isLive,
+  isRenewable,
   needsAttention,
   projectLifecycle,
+  renewalTerm,
 } from "./lifecycle";
 
 const on = "2026-08-11";
@@ -129,6 +131,52 @@ describe("needsAttention", () => {
 
   it("takes a contract expiring on the horizon itself", () => {
     expect(needsAttention({ status: "active", expiresOn: "2026-10-10" }, on)).toBe(true);
+  });
+});
+
+describe("isRenewable", () => {
+  it("takes a live contract", () => {
+    expect(isRenewable({ lifecycle: "active" })).toBe(true);
+  });
+
+  it("takes a non-renewing contract, so a change of mind still renews", () => {
+    expect(isRenewable({ lifecycle: "non_renewing" })).toBe(true);
+  });
+
+  it("takes an expired contract, renewed late", () => {
+    expect(isRenewable({ lifecycle: "expired" })).toBe(true);
+  });
+
+  it("leaves a cancelled contract", () => {
+    expect(isRenewable({ lifecycle: "cancelled" })).toBe(false);
+  });
+});
+
+describe("renewalTerm", () => {
+  it("starts the day after the predecessor expires", () => {
+    expect(renewalTerm({ startsOn: "2026-01-01", expiresOn: "2026-12-31" }).startsOn).toBe(
+      "2027-01-01",
+    );
+  });
+
+  it("keeps the length of the predecessor", () => {
+    expect(renewalTerm({ startsOn: "2026-01-01", expiresOn: "2026-12-31" }).expiresOn).toBe(
+      "2027-12-31",
+    );
+  });
+
+  it("keeps a short term short", () => {
+    expect(renewalTerm({ startsOn: "2026-08-01", expiresOn: "2026-10-31" })).toEqual({
+      startsOn: "2026-11-01",
+      expiresOn: "2027-01-31",
+    });
+  });
+
+  it("survives a daylight saving change", () => {
+    expect(renewalTerm({ startsOn: "2026-09-01", expiresOn: "2026-10-15" })).toEqual({
+      startsOn: "2026-10-16",
+      expiresOn: "2026-11-29",
+    });
   });
 });
 

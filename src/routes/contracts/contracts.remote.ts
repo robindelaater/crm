@@ -26,7 +26,7 @@ export const listContracts = query(async () => {
 export const getContract = query(v.string(), async (id) => {
   const found = await db().query.contract.findFirst({
     where: (row, { eq }) => eq(row.id, id),
-    with: { client: true, project: true, contact: true, renewalOf: true },
+    with: { client: true, project: true, contact: true, renewalOf: true, renewals: true },
   });
 
   if (!found) error(404, "Contract not found");
@@ -64,6 +64,28 @@ export const createContractForm = form(v.object(contractDetails), async (values)
 
   redirect(303, "/contracts");
 });
+
+export const renewContractForm = form(
+  v.object({ renewalOfId: v.string(), ...contractDetails }),
+  async (values) => {
+    const predecessor = await db().query.contract.findFirst({
+      where: eq(contract.id, values.renewalOfId),
+      columns: { id: true },
+    });
+
+    if (!predecessor) error(404, "Contract not found");
+
+    const [renewal] = await db().insert(contract).values(values).returning({ id: contract.id });
+
+    await getContract(values.renewalOfId).refresh();
+    await listContracts().refresh();
+    await listContractsNeedingAttention().refresh();
+    await getStats().refresh();
+    await getClient(values.clientId).refresh();
+
+    redirect(303, `/contracts/${renewal.id}`);
+  },
+);
 
 export const updateContractForm = form(
   v.object({ id: v.string(), ...contractDetails }),

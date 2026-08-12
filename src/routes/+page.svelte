@@ -2,6 +2,7 @@
   import {
     attentionWindowDays,
     contractLifecycleLabels,
+    isRenewable,
     projectLifecycleLabels,
   } from "$lib/lifecycle";
   import Stat from "$lib/components/Stat.svelte";
@@ -105,6 +106,11 @@
               ),
             )} per month
           </p>
+          {#if isRenewable(contract)}
+            <a href="/contracts/{contract.id}/renew" class="hover:underline">
+              Renew
+            </a>
+          {/if}
         </li>
       {/each}
     </ul>
