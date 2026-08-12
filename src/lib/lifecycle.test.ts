@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { contractLifecycle, daysUntil, projectLifecycle } from "./lifecycle";
+import { contractLifecycle, daysUntil, needsAttention, projectLifecycle } from "./lifecycle";
 
 const on = "2026-08-11";
 
@@ -79,6 +79,32 @@ describe("contractLifecycle", () => {
     expect(contractLifecycle({ status: "cancelled", expiresOn: "2026-09-01" }, on)).toBe(
       "cancelled",
     );
+  });
+});
+
+describe("needsAttention", () => {
+  it("takes a contract expiring inside the window", () => {
+    expect(needsAttention({ status: "active", expiresOn: "2026-09-15" }, on)).toBe(true);
+  });
+
+  it("takes a non-renewing contract, still live", () => {
+    expect(needsAttention({ status: "non_renewing", expiresOn: "2026-09-15" }, on)).toBe(true);
+  });
+
+  it("takes an already expired contract", () => {
+    expect(needsAttention({ status: "active", expiresOn: "2026-07-01" }, on)).toBe(true);
+  });
+
+  it("leaves a contract expiring past the window", () => {
+    expect(needsAttention({ status: "active", expiresOn: "2026-11-01" }, on)).toBe(false);
+  });
+
+  it("leaves a cancelled contract", () => {
+    expect(needsAttention({ status: "cancelled", expiresOn: "2026-09-15" }, on)).toBe(false);
+  });
+
+  it("takes a contract expiring on the horizon itself", () => {
+    expect(needsAttention({ status: "active", expiresOn: "2026-10-10" }, on)).toBe(true);
   });
 });
 

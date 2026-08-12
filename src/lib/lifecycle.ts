@@ -26,6 +26,14 @@ export const contractLifecycle = (contract: ContractDates, on = today()): Contra
   return contract.status;
 };
 
+export const attentionWindowDays = 60;
+
+export const attentionHorizon = (on = today()) =>
+  new Date(Date.parse(on) + attentionWindowDays * millisecondsPerDay).toISOString().slice(0, 10);
+
+export const needsAttention = (contract: ContractDates, on = today()) =>
+  contract.status !== "cancelled" && contract.expiresOn <= attentionHorizon(on);
+
 export const withProjectLifecycle = <T extends ProjectDates>(project: T, on = today()) => ({
   ...project,
   lifecycle: projectLifecycle(project, on),

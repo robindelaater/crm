@@ -7,6 +7,7 @@ import { billingPeriods, contract } from "$lib/server/db/schema";
 import { today, withContractLifecycle } from "$lib/lifecycle";
 import { parseAmountToCents } from "$lib/money";
 import { getClient } from "../clients/clients.remote";
+import { listContractsNeedingAttention } from "../attention.remote";
 
 const db = () => getDb(getRequestEvent().platform!.env.DB);
 
@@ -70,6 +71,7 @@ export const createContractForm = form(v.object(contractDetails), async (values)
   await db().insert(contract).values(values);
 
   await listContracts().refresh();
+  await listContractsNeedingAttention().refresh();
   await getClient(values.clientId).refresh();
 
   redirect(303, "/contracts");
@@ -89,6 +91,7 @@ export const updateContractForm = form(
 
     await getContract(id).refresh();
     await listContracts().refresh();
+    await listContractsNeedingAttention().refresh();
     await getClient(values.clientId).refresh();
 
     if (previous.clientId !== values.clientId) await getClient(previous.clientId).refresh();

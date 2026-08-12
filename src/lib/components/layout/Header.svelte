@@ -2,8 +2,10 @@
   import ThemeToggle from "../ThemeToggle.svelte";
 </script>
 
-<header class="mx-auto max-w-lg px-6 py-16 grid grid-flow-col items-center">
-  <a href="/" class="font-bold" title="Home">LAATER.</a>
+<header
+  class="mx-auto grid max-w-lg grid-flow-col items-center px-6 pt-16 pb-6"
+>
+  <a href="/" class="font-bold" title="Needs attention">LAATER.</a>
 
   <div class="flex justify-end">
     <ThemeToggle />

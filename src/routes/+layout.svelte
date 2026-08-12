@@ -3,6 +3,7 @@
   import favicon from "$lib/assets/favicon.svg";
   import { ModeWatcher } from "mode-watcher";
   import Header from "$lib/components/layout/Header.svelte";
+  import Nav from "$lib/components/layout/Nav.svelte";
 
   let { children } = $props();
 </script>
@@ -12,5 +13,7 @@
 <ModeWatcher />
 
 <Header />
+
+<Nav />
 
 {@render children()}
