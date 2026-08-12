@@ -1,6 +1,9 @@
 import { getDb } from "$lib/server/db";
-import { listContractsNeedingAttention } from "$lib/server/attention";
-import { digestHtml, digestSubject, digestText, isSendingHour } from "./digest";
+import {
+  listContractsNeedingAttention,
+  type ContractNeedingAttention,
+} from "$lib/server/attention";
+import { digestContracts, digestSubject, isSendingHour } from "./digest";
 
 type Env = {
   DB: D1Database;
@@ -10,14 +13,24 @@ type Env = {
   APP_URL: string;
 };
 
-const send = async (env: Env, body: Record<string, string>) => {
+const digestTemplateId = "contract-approval";
+
+const send = async (env: Env, contracts: ContractNeedingAttention[]) => {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       authorization: `Bearer ${env.RESEND_API_KEY}`,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ from: env.DIGEST_FROM, to: env.DIGEST_TO, ...body }),
+    body: JSON.stringify({
+      from: env.DIGEST_FROM,
+      to: env.DIGEST_TO,
+      subject: digestSubject(contracts),
+      template: {
+        id: digestTemplateId,
+        variables: { contracts: digestContracts(contracts, env.APP_URL) },
+      },
+    }),
   });
 
   if (!response.ok) {
@@ -30,11 +43,7 @@ const sendDigest = async (env: Env) => {
 
   if (contracts.length === 0) return { sent: false, count: 0 };
 
-  await send(env, {
-    subject: digestSubject(contracts),
-    text: digestText(contracts, env.APP_URL),
-    html: digestHtml(contracts, env.APP_URL),
-  });
+  await send(env, contracts);
 
   return { sent: true, count: contracts.length };
 };

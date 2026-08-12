@@ -35,10 +35,7 @@ export const digestSubject = (contracts: ContractNeedingAttention[]) =>
     ? `1 contract needs attention`
     : `${contracts.length} contracts need attention`;
 
-export const digestText = (contracts: ContractNeedingAttention[], appUrl: string) =>
-  [...contracts.map((contract) => `• ${line(contract)}`), "", appUrl].join("\n");
-
-export const digestHtml = (contracts: ContractNeedingAttention[], appUrl: string) =>
+export const digestContracts = (contracts: ContractNeedingAttention[], appUrl: string) =>
   [
     "<ul>",
     ...contracts.map((contract) => `<li>${escape(line(contract))}</li>`),

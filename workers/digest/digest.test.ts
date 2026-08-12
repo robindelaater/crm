@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { digestHtml, digestSubject, digestText, isSendingHour } from "./digest";
+import { digestContracts, digestSubject, isSendingHour } from "./digest";
 import type { ContractNeedingAttention } from "$lib/server/attention";
 
 const contract = (overrides: Partial<ContractNeedingAttention> = {}) =>
@@ -24,41 +24,43 @@ describe("digestSubject", () => {
   });
 });
 
-describe("digestText", () => {
+describe("digestContracts", () => {
   it("names the client, the contract and the amount", () => {
-    const text = digestText([contract()], "https://crm.laater.dev");
+    const html = digestContracts([contract()], "https://crm.laater.dev");
 
-    expect(text).toContain("Acme — Hosting");
-    expect(text).toContain("monthly");
-    expect(text).toContain("https://crm.laater.dev");
+    expect(html).toContain("Acme — Hosting");
+    expect(html).toContain("monthly");
+    expect(html).toContain("https://crm.laater.dev");
   });
 
   it("counts down to expiry", () => {
-    expect(digestText([contract({ daysUntilExpiry: 20 })], "")).toContain("expires in 20 days");
-  });
-
-  it("says today on the expiry date", () => {
-    expect(digestText([contract({ daysUntilExpiry: 0 })], "")).toContain("expires today");
-  });
-
-  it("says tomorrow the day before", () => {
-    expect(digestText([contract({ daysUntilExpiry: 1 })], "")).toContain("expires tomorrow");
-  });
-
-  it("reports how long ago an expired contract lapsed", () => {
-    expect(digestText([contract({ daysUntilExpiry: -3, lifecycle: "expired" })], "")).toContain(
-      "expired 3 days ago",
+    expect(digestContracts([contract({ daysUntilExpiry: 20 })], "")).toContain(
+      "expires in 20 days",
     );
   });
 
-  it("labels a non-renewing contract", () => {
-    expect(digestText([contract({ lifecycle: "non_renewing" })], "")).toContain("Non-renewing");
+  it("says today on the expiry date", () => {
+    expect(digestContracts([contract({ daysUntilExpiry: 0 })], "")).toContain("expires today");
   });
-});
 
-describe("digestHtml", () => {
+  it("says tomorrow the day before", () => {
+    expect(digestContracts([contract({ daysUntilExpiry: 1 })], "")).toContain("expires tomorrow");
+  });
+
+  it("reports how long ago an expired contract lapsed", () => {
+    expect(
+      digestContracts([contract({ daysUntilExpiry: -3, lifecycle: "expired" })], ""),
+    ).toContain("expired 3 days ago");
+  });
+
+  it("labels a non-renewing contract", () => {
+    expect(digestContracts([contract({ lifecycle: "non_renewing" })], "")).toContain(
+      "Non-renewing",
+    );
+  });
+
   it("escapes names that look like markup", () => {
-    const html = digestHtml([contract({ client: { name: "<b>Acme</b>" } as never })], "");
+    const html = digestContracts([contract({ client: { name: "<b>Acme</b>" } as never })], "");
 
     expect(html).toContain("&lt;b&gt;Acme&lt;/b&gt;");
     expect(html).not.toContain("<b>Acme</b>");
