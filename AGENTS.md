@@ -23,6 +23,8 @@ No docstrings, no section banners, no `// TODO`, no commented-out code.
 
 Exception: a comment that records _why_ something non-obvious is true, where the reason lives outside the code. Those belong in an ADR first; link to it rather than explaining inline.
 
+Components are `CamelCase.svelte` — file name and import name both. Only components generated into `src/lib/components/ui/` by shadcn-svelte or bits-ui keep their kebab-case names; leave those alone.
+
 ## Domain
 
 `CONTEXT.md` is the glossary and it is binding. Use its words in code, tables, routes and UI — do not invent synonyms, and do not use the terms listed under `_Avoid_`. If a new concept appears, add it there as it is resolved.
