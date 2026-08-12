@@ -193,7 +193,9 @@
       {#each client.contracts as contract (contract.id)}
         <li class="py-3 text-sm">
           <div class="flex items-baseline justify-between gap-4">
-            <span>{contract.name}</span>
+            <a href="/contracts/{contract.id}" class="hover:underline"
+              >{contract.name}</a
+            >
             <span class="text-muted-foreground">
               {contractLifecycleLabels[contract.lifecycle]}
             </span>

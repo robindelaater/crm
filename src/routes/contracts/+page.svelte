@@ -22,7 +22,9 @@
       <li class="py-3 text-sm">
         <div class="flex items-baseline justify-between gap-4">
           <span>
-            {contract.name}
+            <a href="/contracts/{contract.id}" class="hover:underline"
+              >{contract.name}</a
+            >
             <a
               href="/clients/{contract.clientId}"
               class="text-muted-foreground hover:underline"
