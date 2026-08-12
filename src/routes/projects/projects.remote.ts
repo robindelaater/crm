@@ -1,0 +1,44 @@
+import { form, getRequestEvent, query } from "$app/server";
+import { redirect } from "@sveltejs/kit";
+import { asc } from "drizzle-orm";
+import * as v from "valibot";
+import { getDb } from "$lib/server/db";
+import { project } from "$lib/server/db/schema";
+import { today, withProjectLifecycle } from "$lib/lifecycle";
+import { getClient } from "../clients/clients.remote";
+
+const db = () => getDb(getRequestEvent().platform!.env.DB);
+
+export const listProjects = query(async () => {
+  const projects = await db().query.project.findMany({
+    orderBy: asc(project.name),
+    with: { client: true },
+  });
+
+  const on = today();
+
+  return projects.map((project) => withProjectLifecycle(project, on));
+});
+
+const optionalText = v.pipe(
+  v.string(),
+  v.trim(),
+  v.transform((value) => value || null),
+);
+
+export const createProjectForm = form(
+  v.object({
+    clientId: v.pipe(v.string(), v.minLength(1, "Client is required")),
+    name: v.pipe(v.string(), v.trim(), v.minLength(1, "Name is required")),
+    startedOn: optionalText,
+    notes: optionalText,
+  }),
+  async ({ clientId, name, startedOn, notes }) => {
+    await db().insert(project).values({ clientId, name, startedOn, notes });
+
+    await listProjects().refresh();
+    await getClient(clientId).refresh();
+
+    redirect(303, "/projects");
+  },
+);

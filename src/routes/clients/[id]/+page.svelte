@@ -8,11 +8,9 @@
     monthlyEquivalentCents,
   } from "$lib/money";
   import {
-    contractState,
-    contractStateLabels,
-    projectState,
-    projectStateLabels,
-  } from "$lib/state";
+    contractLifecycleLabels,
+    projectLifecycleLabels,
+  } from "$lib/lifecycle";
   import { deleteClientForm, getClient } from "../clients.remote";
 
   const client = $derived(await getClient(page.params.id!));
@@ -109,7 +107,7 @@
         <li class="flex items-baseline justify-between gap-4 py-3 text-sm">
           <span>{project.name}</span>
           <span class="text-muted-foreground"
-            >{projectStateLabels[projectState(project)]}</span
+            >{projectLifecycleLabels[project.lifecycle]}</span
           >
         </li>
       {:else}
@@ -126,7 +124,7 @@
           <div class="flex items-baseline justify-between gap-4">
             <span>{contract.name}</span>
             <span class="text-muted-foreground">
-              {contractStateLabels[contractState(contract)]}
+              {contractLifecycleLabels[contract.lifecycle]}
             </span>
           </div>
           <p class="text-muted-foreground">

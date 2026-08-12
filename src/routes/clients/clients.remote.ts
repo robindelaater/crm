@@ -4,6 +4,7 @@ import { asc, eq } from "drizzle-orm";
 import * as v from "valibot";
 import { getDb } from "$lib/server/db";
 import { client, contact, contract, project } from "$lib/server/db/schema";
+import { today, withContractLifecycle, withProjectLifecycle } from "$lib/lifecycle";
 
 const db = () => getDb(getRequestEvent().platform!.env.DB);
 
@@ -21,7 +22,13 @@ export const getClient = query(v.string(), async (id) => {
 
   if (!found) error(404, "Client not found");
 
-  return found;
+  const on = today();
+
+  return {
+    ...found,
+    projects: found.projects.map((project) => withProjectLifecycle(project, on)),
+    contracts: found.contracts.map((contract) => withContractLifecycle(contract, on)),
+  };
 });
 
 const clientDetails = {

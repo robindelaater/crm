@@ -13,8 +13,12 @@ A human belonging to a **Client** who I actually communicate with. A Client has 
 _Avoid_: Person, lead, user
 
 **Project**:
-A piece of work for a **Client** that has an end. Its state is read from its dates, never stored: unscheduled, running, completed, or cancelled.
+A piece of work for a **Client** that has an end. Its **Lifecycle** is read from its dates, never stored: unscheduled, scheduled, running, completed, or cancelled.
 _Avoid_: Job, engagement, gig
+
+**Lifecycle**:
+Where a **Project** or **Contract** has got to, derived at read time from its date columns and its **Status**. A Project is unscheduled, scheduled, running, completed or cancelled; a Contract is active, non-renewing, expired or cancelled. Never stored, never a column. Lives in `src/lib/lifecycle.ts`, which is the only place the date comparisons are written.
+_Avoid_: State, phase, stage
 
 **Cancelled**:
 A **Project** abandoned before delivery, or a **Contract** ended before its expiry date. A decision I make, so it is recorded explicitly. Distinct from completed or expired, and kept distinct on purpose.
@@ -25,7 +29,7 @@ The set of things with a deadline close enough that I should act now — chiefly
 _Avoid_: Dashboard, alerts, inbox
 
 **Status**:
-The state I decide for a **Project** or **Contract**: active, non-renewing, or cancelled. States that arrive by the passage of time (running, completed, expired) are never stored here; they are read from dates.
+The part of a **Lifecycle** I decide for a **Project** or **Contract**, and the only part stored: active, non-renewing, or cancelled. Everything that arrives by the passage of time (running, completed, expired) is never stored here; it is read from dates.
 _Avoid_: State, stage, phase
 
 **Non-renewing**:
