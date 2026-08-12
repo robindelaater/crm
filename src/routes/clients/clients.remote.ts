@@ -5,6 +5,7 @@ import * as v from "valibot";
 import { getDb } from "$lib/server/db";
 import { client, contact, contract, project } from "$lib/server/db/schema";
 import { today, withContractLifecycle, withProjectLifecycle } from "$lib/lifecycle";
+import { getStats } from "../stats.remote";
 
 const db = () => getDb(getRequestEvent().platform!.env.DB);
 
@@ -70,6 +71,7 @@ export const deleteClientForm = form(v.object({ id: v.string() }), async ({ id }
   await db().delete(client).where(eq(client.id, id));
 
   await listClients().refresh();
+  await getStats().refresh();
 
   redirect(303, "/clients");
 });

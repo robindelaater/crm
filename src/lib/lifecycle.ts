@@ -26,6 +26,9 @@ export const contractLifecycle = (contract: ContractDates, on = today()): Contra
   return contract.status;
 };
 
+export const isLive = ({ lifecycle }: { lifecycle: ContractLifecycle }) =>
+  lifecycle === "active" || lifecycle === "non_renewing";
+
 export const attentionWindowDays = 60;
 
 export const attentionHorizon = (on = today()) =>

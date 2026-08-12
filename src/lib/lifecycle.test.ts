@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vite-plus/test";
-import { contractLifecycle, daysUntil, needsAttention, projectLifecycle } from "./lifecycle";
+import {
+  contractLifecycle,
+  daysUntil,
+  isLive,
+  needsAttention,
+  projectLifecycle,
+} from "./lifecycle";
 
 const on = "2026-08-11";
 
@@ -79,6 +85,24 @@ describe("contractLifecycle", () => {
     expect(contractLifecycle({ status: "cancelled", expiresOn: "2026-09-01" }, on)).toBe(
       "cancelled",
     );
+  });
+});
+
+describe("isLive", () => {
+  it("takes an active contract", () => {
+    expect(isLive({ lifecycle: "active" })).toBe(true);
+  });
+
+  it("takes a non-renewing contract, still serving", () => {
+    expect(isLive({ lifecycle: "non_renewing" })).toBe(true);
+  });
+
+  it("leaves an expired contract", () => {
+    expect(isLive({ lifecycle: "expired" })).toBe(false);
+  });
+
+  it("leaves a cancelled contract", () => {
+    expect(isLive({ lifecycle: "cancelled" })).toBe(false);
   });
 });
 

@@ -10,6 +10,15 @@ const monthsPerPeriod: Record<BillingPeriod, number> = {
 export const monthlyEquivalentCents = (amountCents: number, billingPeriod: BillingPeriod) =>
   Math.round(amountCents / monthsPerPeriod[billingPeriod]);
 
+type Recurring = { amountCents: number; billingPeriod: BillingPeriod };
+
+export const totalMonthlyEquivalentCents = (recurring: Recurring[]) =>
+  recurring.reduce(
+    (total, { amountCents, billingPeriod }) =>
+      total + monthlyEquivalentCents(amountCents, billingPeriod),
+    0,
+  );
+
 const euros = new Intl.NumberFormat("nl-NL", {
   style: "currency",
   currency: "EUR",

@@ -4,13 +4,19 @@
     contractLifecycleLabels,
     projectLifecycleLabels,
   } from "$lib/lifecycle";
+  import Stat from "$lib/components/Stat.svelte";
   import { formatAmount, monthlyEquivalentCents } from "$lib/money";
   import {
     listContractsNeedingAttention,
     listLiveProjects,
   } from "./attention.remote";
+  import { getStats } from "./stats.remote";
 
   const contracts = $derived(await listContractsNeedingAttention());
+
+  const stats = $derived(await getStats());
+
+  const euros = { style: "currency", currency: "EUR" } as const;
 
   const expiry = (days: number) => {
     if (days < 0) return `Expired ${-days} ${-days === 1 ? "day" : "days"} ago`;
@@ -21,6 +27,21 @@
 
 <main class="mx-auto max-w-lg px-6 py-16">
   <h1 class="text-xl font-medium">Needs attention</h1>
+
+  <div class="mt-8 grid grid-cols-2 gap-3">
+    <Stat label="Projects running" value={stats.runningProjects} />
+    <Stat label="Contracts live" value={stats.liveContracts} />
+    <Stat
+      label="In per month"
+      value={stats.monthlyInCents / 100}
+      format={euros}
+    />
+    <Stat
+      label="Out per month"
+      value={stats.monthlyOutCents / 100}
+      format={euros}
+    />
+  </div>
 
   {#if contracts.length === 0}
     <p class="text-muted-foreground mt-8 text-sm">

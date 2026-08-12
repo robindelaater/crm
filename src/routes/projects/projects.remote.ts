@@ -6,6 +6,7 @@ import { getDb } from "$lib/server/db";
 import { project } from "$lib/server/db/schema";
 import { today, withProjectLifecycle } from "$lib/lifecycle";
 import { getClient } from "../clients/clients.remote";
+import { getStats } from "../stats.remote";
 
 const db = () => getDb(getRequestEvent().platform!.env.DB);
 
@@ -48,6 +49,7 @@ export const createProjectForm = form(
     await db().insert(project).values({ clientId, name, startedOn, notes });
 
     await listProjects().refresh();
+    await getStats().refresh();
     await getClient(clientId).refresh();
 
     redirect(303, "/projects");
@@ -67,6 +69,7 @@ const applyToProject = async (id: string, values: Partial<typeof project.$inferI
 
   await getProject(id).refresh();
   await listProjects().refresh();
+  await getStats().refresh();
   await getClient(changed.clientId).refresh();
 };
 

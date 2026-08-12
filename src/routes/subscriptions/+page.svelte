@@ -4,10 +4,15 @@
     billingPeriodLabels,
     formatAmount,
     monthlyEquivalentCents,
+    totalMonthlyEquivalentCents,
   } from "$lib/money";
   import { listSubscriptions } from "./subscriptions.remote";
 
   const subscriptions = $derived(await listSubscriptions());
+
+  const active = $derived(subscriptions.filter((s) => s.status === "active"));
+
+  const monthlyOut = $derived(totalMonthlyEquivalentCents(active));
 </script>
 
 <main class="mx-auto max-w-lg px-6 py-16">
@@ -42,4 +47,11 @@
       <li class="text-muted-foreground py-3 text-sm">No subscriptions yet.</li>
     {/each}
   </ul>
+
+  {#if active.length > 0}
+    <p class="mt-6 flex items-baseline justify-between gap-4 text-sm">
+      <span class="text-muted-foreground">Going out per month</span>
+      <span class="font-medium">{formatAmount(monthlyOut)}</span>
+    </p>
+  {/if}
 </main>

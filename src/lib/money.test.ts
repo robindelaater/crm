@@ -4,6 +4,7 @@ import {
   formatAmountInput,
   monthlyEquivalentCents,
   parseAmountToCents,
+  totalMonthlyEquivalentCents,
 } from "./money";
 
 describe("parseAmountToCents", () => {
@@ -127,5 +128,30 @@ describe("monthlyEquivalentCents", () => {
 
   it("rounds to whole cents", () => {
     expect(monthlyEquivalentCents(10000, "quarterly")).toBe(3333);
+  });
+});
+
+describe("totalMonthlyEquivalentCents", () => {
+  it("is zero with nothing to add", () => {
+    expect(totalMonthlyEquivalentCents([])).toBe(0);
+  });
+
+  it("adds different billing periods together", () => {
+    expect(
+      totalMonthlyEquivalentCents([
+        { amountCents: 120000, billingPeriod: "monthly" },
+        { amountCents: 300000, billingPeriod: "quarterly" },
+        { amountCents: 120000, billingPeriod: "yearly" },
+      ]),
+    ).toBe(230000);
+  });
+
+  it("adds the rounded monthly equivalents, not the raw amounts", () => {
+    expect(
+      totalMonthlyEquivalentCents([
+        { amountCents: 10000, billingPeriod: "quarterly" },
+        { amountCents: 10000, billingPeriod: "quarterly" },
+      ]),
+    ).toBe(6666);
   });
 });

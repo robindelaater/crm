@@ -1,14 +1,19 @@
 <script lang="ts">
   import { Button } from "$lib/components/ui/button";
-  import { contractLifecycleLabels } from "$lib/lifecycle";
+  import { contractLifecycleLabels, isLive } from "$lib/lifecycle";
   import {
     billingPeriodLabels,
     formatAmount,
     monthlyEquivalentCents,
+    totalMonthlyEquivalentCents,
   } from "$lib/money";
   import { listContracts } from "./contracts.remote";
 
   const contracts = $derived(await listContracts());
+
+  const monthlyIn = $derived(
+    totalMonthlyEquivalentCents(contracts.filter(isLive)),
+  );
 </script>
 
 <main class="mx-auto max-w-lg px-6 py-16">
@@ -55,4 +60,11 @@
       <li class="text-muted-foreground py-3 text-sm">No contracts yet.</li>
     {/each}
   </ul>
+
+  {#if contracts.some(isLive)}
+    <p class="mt-6 flex items-baseline justify-between gap-4 text-sm">
+      <span class="text-muted-foreground">Coming in per month</span>
+      <span class="font-medium">{formatAmount(monthlyIn)}</span>
+    </p>
+  {/if}
 </main>

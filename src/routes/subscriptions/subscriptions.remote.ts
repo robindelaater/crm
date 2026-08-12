@@ -5,6 +5,7 @@ import * as v from "valibot";
 import { getDb } from "$lib/server/db";
 import { billingPeriods, subscription } from "$lib/server/db/schema";
 import { amountCentsField } from "$lib/money";
+import { getStats } from "../stats.remote";
 
 const db = () => getDb(getRequestEvent().platform!.env.DB);
 
@@ -39,6 +40,7 @@ export const createSubscriptionForm = form(v.object(subscriptionDetails), async 
   await db().insert(subscription).values(values);
 
   await listSubscriptions().refresh();
+  await getStats().refresh();
 
   redirect(303, "/subscriptions");
 });
@@ -56,6 +58,7 @@ export const updateSubscriptionForm = form(
 
     await getSubscription(id).refresh();
     await listSubscriptions().refresh();
+    await getStats().refresh();
 
     redirect(303, `/subscriptions/${id}`);
   },
@@ -65,6 +68,7 @@ export const deleteSubscriptionForm = form(v.object({ id: v.string() }), async (
   await db().delete(subscription).where(eq(subscription.id, id));
 
   await listSubscriptions().refresh();
+  await getStats().refresh();
 
   redirect(303, "/subscriptions");
 });
