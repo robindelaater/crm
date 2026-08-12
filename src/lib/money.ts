@@ -1,3 +1,4 @@
+import * as v from "valibot";
 import type { BillingPeriod } from "$lib/server/db/schema";
 
 const monthsPerPeriod: Record<BillingPeriod, number> = {
@@ -53,3 +54,17 @@ export const parseAmountToCents = (input: string) => {
 
   return Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
 };
+
+export const amountCentsField = v.pipe(
+  v.string(),
+  v.rawTransform<string, number>(({ dataset, addIssue, NEVER }) => {
+    const cents = parseAmountToCents(dataset.value);
+
+    if (cents === null) {
+      addIssue({ message: "Amount must be an amount in euros, like 1250,00" });
+      return NEVER;
+    }
+
+    return cents;
+  }),
+);

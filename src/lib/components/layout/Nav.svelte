@@ -4,4 +4,7 @@
   <a href="/contracts" class="text-muted-foreground hover:underline"
     >Contracts</a
   >
+  <a href="/subscriptions" class="text-muted-foreground hover:underline"
+    >Subscriptions</a
+  >
 </nav>
