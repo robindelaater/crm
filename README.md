@@ -17,7 +17,7 @@ Every word above has an exact meaning. They are written down in [CONTEXT.md](CON
 
 ## Two things that look wrong but are not
 
-1. **Nothing stores "expired" or "running".** The database only stores what I decided: `active`, `non_renewing`, `cancelled`. Everything else is worked out from dates when a page loads. No cron job. See [ADR 0001](docs/adr/0001-stored-status-vs-computed-dates.md).
+1. **Nothing stores "expired" or "running".** The database only stores what I decided: `active`, `non_renewing`, `cancelled`. Everything else is worked out from dates when a page loads. No cron writes it back. See [ADR 0001](docs/adr/0001-stored-status-vs-computed-dates.md).
 2. **There is no auth code.** Cloudflare Access handles it before a request ever reaches the app. See [ADR 0002](docs/adr/0002-authentication-is-cloudflare-access.md).
 
 Money is stored as whole cents, euros, without VAT.

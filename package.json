@@ -14,7 +14,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply laater-crm --remote",
     "db:migrate:local": "wrangler d1 migrations apply laater-crm --local",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "digest:dev": "wrangler dev --config workers/digest/wrangler.jsonc --test-scheduled --remote",
+    "digest:deploy": "wrangler deploy --config workers/digest/wrangler.jsonc"
   },
   "dependencies": {
     "@number-flow/svelte": "^0.4.2",

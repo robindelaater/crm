@@ -28,6 +28,10 @@ _Avoid_: Closed, dropped, dead
 The set of things with a deadline close enough that I should act now — chiefly **Contracts** near expiry. It is the front door of the app; client and project lists are navigation behind it.
 _Avoid_: Dashboard, alerts, inbox
 
+**Digest**:
+The weekly email listing everything in **Needs attention**. A snapshot, not a notification: it repeats the same **Contract** every Monday until the Contract leaves the window. Nothing about it is stored.
+_Avoid_: Alert, notification, reminder
+
 **Status**:
 The part of a **Lifecycle** I decide for a **Project** or **Contract**, and the only part stored: active, non-renewing, or cancelled. Everything that arrives by the passage of time (running, completed, expired) is never stored here; it is read from dates.
 _Avoid_: State, stage, phase

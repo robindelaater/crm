@@ -33,7 +33,7 @@ Exception: a comment that records _why_ something non-obvious is true, where the
 
 Two that catch people out:
 
-- **Lifecycle is derived from dates, never stored.** `status` holds only what I decide (`active`, `non_renewing`, `cancelled`). Expired, running and completed are read from date columns at query time by the helpers in `src/lib/lifecycle.ts`. There is no cron job and there should not be one. See ADR 0001.
+- **Lifecycle is derived from dates, never stored.** `status` holds only what I decide (`active`, `non_renewing`, `cancelled`). Expired, running and completed are read from date columns at query time by the helpers in `src/lib/lifecycle.ts`. No cron may ever write lifecycle back to the database. See ADR 0001. The one cron that exists only reads, to send the weekly digest — ADR 0004.
 - **There is no authentication code.** Cloudflare Access sits in front of the deployment. Do not add a login route, a session table or request guards. See ADR 0002.
 
 ## Money
